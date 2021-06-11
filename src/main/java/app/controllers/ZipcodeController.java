@@ -1,7 +1,9 @@
 package app.controllers;
 
 import app.entities.Address;
-import app.exceptions.InvalidSearchCepException;
+import app.exceptions.ExceptionDto;
+import app.exceptions.InvalidSearchZipcodeException;
+import app.exceptions.InvalidZipcodeException;
 import app.services.AddressService;
 
 import javax.inject.Inject;
@@ -23,8 +25,12 @@ public class ZipcodeController {
         try {
             Address address = service.verify(zipcode);
             return Response.ok(address).build();
-        } catch (InvalidSearchCepException e) {
-            return Response.serverError().build();
+        } catch (InvalidZipcodeException | InvalidSearchZipcodeException e) {
+            return Response.serverError().entity(handleErrors(e)).build();
         }
+    }
+
+    private ExceptionDto handleErrors(Exception exception) {
+        return new ExceptionDto(exception.getMessage());
     }
 }

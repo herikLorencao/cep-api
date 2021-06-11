@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 <jboss-web>
-    <context-root>cep</context-root>
+    <context-root>address</context-root>
 </jboss-web>

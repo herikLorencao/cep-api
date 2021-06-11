@@ -3,7 +3,9 @@ package app.services;
 import app.data.repositories.AddressRepository;
 import app.data.repositories.ViaCepRepository;
 import app.entities.Address;
-import app.exceptions.InvalidSearchCepException;
+import app.entities.Zipcode;
+import app.exceptions.InvalidSearchZipcodeException;
+import app.exceptions.InvalidZipcodeException;
 import lombok.SneakyThrows;
 
 import javax.ejb.Stateless;
@@ -18,20 +20,21 @@ public class AddressService {
     @Inject
     private ViaCepRepository viaCepRepository;
 
-    public Address verify(String zipcode) throws InvalidSearchCepException {
-        Address address = findInDatabase(zipcode);
+    public Address verify(String zipcode) throws InvalidSearchZipcodeException, InvalidZipcodeException {
+        Zipcode zipcodeInfo = new Zipcode(zipcode);
+        Address address = findInDatabase(zipcodeInfo);
 
         if (address == null)
-            return create(zipcode);
+            return create(zipcodeInfo);
 
         if (!isValidAddress(address))
-            return update(address);
+            return update(zipcodeInfo);
 
         return address;
     }
 
-    private Address create(String zipcode) {
-        Address address = findByAPI(zipcode);
+    private Address create(Zipcode zipcode) {
+        Address address = findByAPI(zipcode.getContent());
         createInDatabase(address);
         return address;
     }
@@ -42,11 +45,11 @@ public class AddressService {
         return nowTime.isBefore(addressDateTimeValidRange);
     }
 
-    private Address findInDatabase(String zipcode) throws InvalidSearchCepException {
+    private Address findInDatabase(Zipcode zipcode) throws InvalidSearchZipcodeException {
         try {
-            return databaseRepository.findByCep(zipcode);
+            return databaseRepository.findByCep(zipcode.getContent());
         } catch (Exception e) {
-            throw new InvalidSearchCepException("Não foi possível acessar a base de dados");
+            throw new InvalidSearchZipcodeException("Não foi possível acessar a base de dados");
         }
     }
 
@@ -55,7 +58,7 @@ public class AddressService {
         try {
             return viaCepRepository.find(zipcode);
         } catch (Exception e) {
-            throw new InvalidSearchCepException("Não foi possível realizar a requisição na API");
+            throw new InvalidSearchZipcodeException("Não foi possível realizar a requisição na API");
         }
     }
 
@@ -63,7 +66,7 @@ public class AddressService {
         databaseRepository.create(address);
     }
 
-    public Address update(Address address) {
-        return databaseRepository.update(address);
+    public Address update(Zipcode zipcode)  {
+        return databaseRepository.update(zipcode.getContent());
     }
 }

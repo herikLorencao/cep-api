@@ -7,6 +7,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Stateless
@@ -14,14 +15,13 @@ public class AddressRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Address findByCep(String cep) {
-        TypedQuery<AddressDatabase> query = entityManager
-                .createQuery("SELECT a FROM AddressDatabase a WHERE a.zipcode = :zipcode", AddressDatabase.class);
-        query.setParameter("zipcode", cep);
-        List<AddressDatabase> results = query.getResultList();
+    public Address findByCep(String zipcode) {
+        AddressDatabase addressData = findDataByCep(zipcode);
 
-        if (results.isEmpty()) return null;
-        return results.get(0).parse();
+        if (addressData == null)
+            return null;
+
+        return addressData.parse();
     }
 
     public void create(Address address) {
@@ -30,11 +30,20 @@ public class AddressRepository {
         entityManager.persist(addressDatabase);
     }
 
-
-    public Address update(Address address) {
-        AddressDatabase addressDatabase = new AddressDatabase();
-        addressDatabase.map(address);
+    public Address update(String zipcode) {
+        AddressDatabase addressDatabase = findDataByCep(zipcode);
+        addressDatabase.setUpdatedDate(LocalDateTime.now());
         AddressDatabase updatedAddressDatabase = entityManager.merge(addressDatabase);
-        return addressDatabase.parse();
+        return updatedAddressDatabase.parse();
+    }
+
+    private AddressDatabase findDataByCep(String zipcode) {
+        TypedQuery<AddressDatabase> query = entityManager
+                .createQuery("SELECT a FROM AddressDatabase a WHERE a.zipcode = :zipcode", AddressDatabase.class);
+        query.setParameter("zipcode", zipcode);
+        List<AddressDatabase> results = query.getResultList();
+
+        if (results.isEmpty()) return null;
+        return results.get(0);
     }
 }

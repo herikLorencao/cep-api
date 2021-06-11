@@ -2,12 +2,13 @@ package app.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.json.bind.annotation.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode
 public class Address implements Serializable {
     private String zipcode;
     private String street;
