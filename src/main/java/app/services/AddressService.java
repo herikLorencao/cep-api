@@ -67,6 +67,7 @@ public class AddressService {
     }
 
     public Address update(Zipcode zipcode)  {
-        return databaseRepository.update(zipcode.getContent());
+        Address addressApi = findByAPI(zipcode.getContent());
+        return databaseRepository.update(addressApi);
     }
 }

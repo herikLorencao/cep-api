@@ -30,9 +30,9 @@ public class AddressRepository {
         entityManager.persist(addressDatabase);
     }
 
-    public Address update(String zipcode) {
-        AddressDatabase addressDatabase = findDataByCep(zipcode);
-        addressDatabase.setUpdatedDate(LocalDateTime.now());
+    public Address update(Address address) {
+        AddressDatabase addressDatabase = findDataByCep(address.getZipcode());
+        addressDatabase.map(address);
         AddressDatabase updatedAddressDatabase = entityManager.merge(addressDatabase);
         return updatedAddressDatabase.parse();
     }
