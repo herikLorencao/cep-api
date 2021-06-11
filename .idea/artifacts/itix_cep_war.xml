@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="itix-cep:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>itix-cep</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="itix-cep-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="itix-cep:war exploded" />
+    </root>
+  </artifact>
+</component>
